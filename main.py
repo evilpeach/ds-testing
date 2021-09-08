@@ -36,24 +36,24 @@ SYMBOLS = [
 
 header = ["timestamp", "twelvedata", "finage", "yahoo_finance"]
 
-print("start")
+while True:
+    ask_time = int(time.time())
+    print("start at ", ask_time)
 
-twelvedata_prices = get_twelvedata_price(SYMBOLS)
-# print(twelvedata_prices)
+    # twelvedata_prices = get_twelvedata_price(SYMBOLS)
+    # finage_prices = get_finage_price((SYMBOLS))
+    # yfinance_prices = get_yfinance_prices(SYMBOLS)
 
-finage_prices = get_finage_price((SYMBOLS))
-# print(finage_prices)
+    for symbol in SYMBOLS:
+        with open("./reports/" + symbol + ".csv", "a+", encoding="UTF8") as f:
+            writer = csv.writer(f)
 
-yfinance_prices = get_yfinance_prices(SYMBOLS)
-# print(yfinance_prices)
+            # write the header
+            # writer.writerow(header)
 
-for symbol in SYMBOLS:
-    with open("./reports/" + symbol + ".csv", "a+", encoding="UTF8") as f:
-        writer = csv.writer(f)
+            # write the data
+            data = [ask_time, twelvedata_prices[symbol], finage_prices[symbol], yfinance_prices[symbol]]
+            writer.writerow(data)
 
-        # write the header
-        # writer.writerow(header)
-
-        # write the data
-        data = [int(time.time()), twelvedata_prices[symbol], finage_prices[symbol], yfinance_prices[symbol]]
-        writer.writerow(data)
+    print("save and sleep for 1 min")
+    time.sleep(60)

@@ -10,10 +10,13 @@ def get_price(symbols):
 
 
 def get_finage_price(symbols):
-    result = get_price(symbols)
-    prices = {}
+    try:
+        result = get_price(symbols)
+        prices = {}
 
-    for each in result:
-        prices[each["symbol"]] = each["price"]
+        for each in result:
+            prices[each["symbol"]] = each["price"]
 
-    return prices
+        return prices
+    except:
+        return dict.fromkeys(symbols)

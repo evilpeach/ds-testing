@@ -12,10 +12,13 @@ def get_price(symbols):
 
 
 def get_twelvedata_price(symbols):
-    result = get_price(symbols)
-    prices = {}
+    try:
+        result = get_price(symbols)
+        prices = {}
 
-    for symbol in result:
-        prices[symbol] = result[symbol]["price"]
+        for symbol in result:
+            prices[symbol] = result[symbol]["price"]
 
-    return prices
+        return prices
+    except:
+        return dict.fromkeys(symbols)

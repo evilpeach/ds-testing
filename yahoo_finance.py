@@ -28,15 +28,18 @@ def get_price(tickers, symbol):
 
 
 def get_yfinance_prices(symbols):
-    tickers = yf.Tickers(" ".join(symbols))
-    results = {}
-    with concurrent.futures.ThreadPoolExecutor(max_workers=len(symbols)) as executor:
-        future_to_symbol = {executor.submit(get_price, tickers, symbol): symbol for (symbol) in symbols}
-        for future in concurrent.futures.as_completed(future_to_symbol):
-            symbol = future_to_symbol[future]
-            try:
-                results[symbol] = future.result()
-            except Exception as exc:
-                print(f"{symbol} generated an exception: {exc}")
+    try:
+        tickers = yf.Tickers(" ".join(symbols))
+        results = {}
+        with concurrent.futures.ThreadPoolExecutor(max_workers=len(symbols)) as executor:
+            future_to_symbol = {executor.submit(get_price, tickers, symbol): symbol for (symbol) in symbols}
+            for future in concurrent.futures.as_completed(future_to_symbol):
+                symbol = future_to_symbol[future]
+                try:
+                    results[symbol] = future.result()
+                except Exception as exc:
+                    print(f"{symbol} generated an exception: {exc}")
 
-    return results
+        return results
+    except:
+        return dict.fromkeys(symbols)

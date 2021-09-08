@@ -29,7 +29,7 @@ def get_price(tickers, symbol):
 
 def get_yfinance_prices(symbols):
     try:
-        tickers = yf.Tickers(" ".join(symbols))
+        tickers = yf.Tickers(" ".join(symbols), timeout=30)
         results = {}
         with concurrent.futures.ThreadPoolExecutor(max_workers=len(symbols)) as executor:
             future_to_symbol = {executor.submit(get_price, tickers, symbol): symbol for (symbol) in symbols}

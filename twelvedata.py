@@ -8,7 +8,9 @@ API_KEY = os.getenv("TWELVEDATA_API_KEY")
 
 def get_price(symbols):
     URL = "https://api.twelvedata.com/price"
-    return requests.get(URL, params={"symbol": ",".join(symbols), "apikey": API_KEY, "prepost": "true"}).json()
+    return requests.get(
+        URL, params={"symbol": ",".join(symbols), "apikey": API_KEY, "prepost": "true"}, timeout=30
+    ).json()
 
 
 def get_twelvedata_price(symbols):

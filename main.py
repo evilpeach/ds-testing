@@ -40,9 +40,9 @@ while True:
     ask_time = int(time.time())
     print("start at ", ask_time)
 
-    # twelvedata_prices = get_twelvedata_price(SYMBOLS)
-    # finage_prices = get_finage_price((SYMBOLS))
-    # yfinance_prices = get_yfinance_prices(SYMBOLS)
+    twelvedata_prices = get_twelvedata_price(SYMBOLS)
+    finage_prices = get_finage_price((SYMBOLS))
+    yfinance_prices = get_yfinance_prices(SYMBOLS)
 
     for symbol in SYMBOLS:
         with open("./reports/" + symbol + ".csv", "a+", encoding="UTF8") as f:

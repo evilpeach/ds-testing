@@ -1,38 +1,36 @@
-import datetime
+from time import time
 import concurrent.futures
-import yfinance as yf
+import http.client
 import sys
+import json
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
 
 
-# US stock market hours
-# The NYSE and the NASDAQ are the two largest American exchanges,
-# both of which are located in New York City. Their regular stock
-# trading hours are Monday to Friday 9:30 am to 4:30 pm EST (2:30pm to 9pm GMT).
-# 2:30pm to 9pm GMT -> 14:30 to 21:00
-def get_price(tickers, symbol):
-    # if market is open then use "regularMarketPrice"
-    # else use "preMarketPrice"
+def get_price(symbol):
+    conn = http.client.HTTPSConnection("query2.finance.yahoo.com")
+    payload = ""
+    headers = {"Content-Type": "application/json"}
+    conn.request("GET", "/v8/finance/chart/" + symbol, payload, headers)
+    res = conn.getresponse()
+    data = json.loads(res.read())
+    meta = data["chart"]["result"][0]["meta"]
+    regular_period = meta["currentTradingPeriod"]["regular"]
+    (regular_time_start, regular_time_end) = (regular_period["start"], regular_period["end"])
 
     # utc now
-    now = datetime.datetime.utcnow()
-    # 14:30
-    open_time = datetime.datetime(now.year, now.month, now.day, 14, 30)
-    # 21:00
-    close_time = datetime.datetime(now.year, now.month, now.day, 21, 0)
-
-    # post market?
-    if now > open_time and now < close_time:
-        return tickers.tickers[symbol].info["regularMarketPrice"]
+    now = int(time())
+    if now > int(regular_time_start) and now < int(regular_time_end):
+        return meta["regularMarketPrice"]
     else:
-        return tickers.tickers[symbol].info["preMarketPrice"]
+        return meta["previousClose"]
 
 
 def get_yfinance_prices(symbols):
+    results = dict.fromkeys(symbols)
     try:
-        tickers = yf.Tickers(" ".join(symbols))
-        results = {}
         with concurrent.futures.ThreadPoolExecutor(max_workers=len(symbols)) as executor:
-            future_to_symbol = {executor.submit(get_price, tickers, symbol): symbol for (symbol) in symbols}
+            future_to_symbol = {executor.submit(get_price, symbol): symbol for (symbol) in symbols}
             for future in concurrent.futures.as_completed(future_to_symbol):
                 symbol = future_to_symbol[future]
                 try:
@@ -41,5 +39,6 @@ def get_yfinance_prices(symbols):
                     print(f"{symbol} generated an exception: {exc}")
 
         return results
-    except:
-        return dict.fromkeys(symbols)
+    except Exception as e:
+        print("yfinance: ", e)
+        return result

@@ -12,11 +12,13 @@ def get_price(symbols):
 def get_finage_price(symbols):
     try:
         result = get_price(symbols)
-        prices = {}
+        prices = dict.fromkeys(symbols)
 
         for each in result:
-            prices[each["symbol"]] = each["price"]
+            if each is not None:
+                prices[each["symbol"]] = each["price"]
 
         return prices
-    except:
+    except Exception as e:
+        print("finage: ", e)
         return dict.fromkeys(symbols)

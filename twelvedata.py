@@ -1,6 +1,5 @@
 import os
 import requests
-import time
 
 
 API_KEY = os.getenv("TWELVEDATA_API_KEY")
@@ -19,8 +18,12 @@ def get_twelvedata_price(symbols):
         prices = {}
 
         for symbol in result:
-            prices[symbol] = result[symbol]["price"]
+            if "price" in result[symbol]:
+                prices[symbol] = result[symbol]["price"]
+            else:
+                prices[symbol] = None
 
         return prices
-    except:
+    except Exception as e:
+        print("twelvedata: ", e)
         return dict.fromkeys(symbols)
